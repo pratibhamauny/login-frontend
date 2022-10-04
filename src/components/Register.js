@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from 'react'
-
+import axios from 'axios'
 const Register = () => {
    const [formValues,setFormValues]=useState({
     username:"",
@@ -8,6 +8,7 @@ const Register = () => {
    })
    const [isSubmit,setIsSubmit]=useState(false)
    const [formErrors,setFormErrors]=useState({})
+   const [msg,setMsg]=useState('')
    
    const handlerChange=(e)=>{
    // console.log(e.target)
@@ -23,7 +24,22 @@ const Register = () => {
     useEffect(()=>{
        // console.log(formErrors)
         if(Object.keys(formErrors).length===0 && isSubmit){
-            console.log(formValues)
+           // console.log(formValues)
+           axios.post(' https://qog1hea9qj.execute-api.us-west-1.amazonaws.com/prod/register',
+           formValues,{
+            headers:{
+                'Content-Type':'application/json',
+                'x-api-key':'wX5hV1INCk8R3QaWAW5d56neeKxZhBU93jp62O2l'
+            }})
+            .then(response=>setMsg("Registration successful."))
+            .catch(error=>{
+            if(error.response.status===401){
+                setMsg(error.response.data.message)
+            }
+            else{
+                setMsg('sorry....server is down.please try later.')
+            }
+    })
         }
     },[formErrors])
 
@@ -54,7 +70,7 @@ const Register = () => {
    //console.log(formValues.username)
   return (
     <div>
-    {Object.keys(formErrors).length===0 && isSubmit?<div className='signedIn'>Signed in successfully.</div>:null}
+    {Object.keys(formErrors).length===0 && isSubmit?<div className='signedIn'>{msg}</div>:null}
        <form onSubmit={handlerSubmit}>
        <h2>Create your account </h2>
         <div><input type="text" name="username" placeholder="Username" value={formValues.username} onChange={handlerChange}/></div>
